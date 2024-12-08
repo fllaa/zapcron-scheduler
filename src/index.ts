@@ -28,7 +28,7 @@ async function main() {
       };
       if (job.headers) options.headers = job.headers as Record<string, string>;
       if (job.body) options.body = job.body as BodyInit;
-      const response = await ky(job.url, {});
+      const response = await ky(job.url, options);
       await db.insert(logs).values({
         jobId: job.id,
         status: response.status.toString(),
