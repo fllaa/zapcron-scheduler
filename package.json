@@ -2,10 +2,28 @@
   "name": "bolabali-scheduler",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start": "bun src/index.ts",
+    "dev": "bun src/index.ts --hot",
+    "build": "ncc build src/index.ts -o dist --minify",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@vercel/ncc": "^0.38.3",
+    "drizzle-kit": "^0.29.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "cron": "^3.2.1",
+    "cron-parser": "^4.9.0",
+    "drizzle-orm": "^0.37.0",
+    "ky": "^1.7.2",
+    "postgres": "^3.4.5"
   }
 }
