@@ -1,6 +1,6 @@
 import { CronJob } from "cron";
 import parser from "cron-parser";
-import { eq, lte } from "drizzle-orm";
+import { and, eq, lte } from "drizzle-orm";
 import ky, { type Options } from "ky";
 import { db } from "~/db";
 import { jobs, logs } from "~/db/schema";
@@ -16,7 +16,7 @@ async function main() {
     const result = await db
       .select()
       .from(jobs)
-      .where(lte(jobs.executeAt, new Date()));
+      .where(and(lte(jobs.executeAt, new Date()), eq(jobs.isEnabled, true)));
     if (result.length === 0) {
       console.log("[Scheduler] No jobs to run, skipping...");
       return;
