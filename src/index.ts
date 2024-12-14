@@ -59,6 +59,19 @@ async function main() {
     { connection: redisConn }
   );
 
+  worker.on("ready", () => {
+    console.log("[Worker] Ready");
+  });
+  worker.on("progress", (job, progress) => {
+    console.log(`[Worker] Job ${job.id} progress:`, progress);
+  });
+  worker.on("completed", (job) => {
+    console.log(`[Worker] Job ${job.id} completed`);
+  });
+  worker.on("failed", (job, err) => {
+    console.error(`[Worker] Job ${job!.id} failed:`, err);
+  });
+
   const job = new CronJob("* * * * *", async () => {
     console.log("[Scheduler] Checking jobs to run");
     const result = await db
@@ -76,13 +89,6 @@ async function main() {
 
   job.start();
   console.log("[Scheduler] Started");
-
-  worker.on("completed", (job) => {
-    console.log(`[Worker] Job ${job.id} completed`);
-  });
-  worker.on("failed", (job, err) => {
-    console.error(`[Worker] Job ${job!.id} failed:`, err);
-  });
 
   process.on("SIGINT", () => {
     job.stop();
