@@ -20,9 +20,11 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "bullmq": "^5.34.1",
     "cron": "^3.2.1",
     "cron-parser": "^4.9.0",
     "drizzle-orm": "^0.37.0",
+    "ioredis": "^5.4.1",
     "ky": "^1.7.2",
     "postgres": "^3.4.5"
   }

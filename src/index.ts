@@ -1,15 +1,63 @@
+import { Queue, Worker } from "bullmq";
 import { CronJob } from "cron";
 import parser from "cron-parser";
 import { and, eq, lte } from "drizzle-orm";
+import IORedis from "ioredis";
 import ky, { type Options } from "ky";
 import { db } from "~/db";
 import { jobs, logs } from "~/db/schema";
 
 async function main() {
   // Check environment variables
-  if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is required");
+  const requiredEnvs = {
+    DATABASE_URL: process.env.DATABASE_URL,
+  };
+  for (const [key, value] of Object.entries(requiredEnvs)) {
+    if (!value) {
+      throw new Error(`Missing required environment variable: ${key}`);
+    }
   }
+
+  const redisConn = new IORedis({
+    host: process.env.REDIS_HOST || "localhost",
+    port: parseInt(process.env.REDIS_PORT || "6379"),
+    password: process.env.REDIS_PASSWORD,
+    db: parseInt(process.env.REDIS_DB || "0"),
+    maxRetriesPerRequest: null,
+  });
+
+  const queue = new Queue("jobs", { connection: redisConn });
+
+  const worker = new Worker(
+    "jobs",
+    async (job) => {
+      if (job.name === "execute") {
+        const options: Options = {
+          method: job.data.method,
+          throwHttpErrors: false,
+        };
+        if (job.data.headers)
+          options.headers = job.data.headers as Record<string, string>;
+        if (job.data.body) options.body = job.data.body as BodyInit;
+        const response = await ky(job.data.url, options);
+        await db.insert(logs).values({
+          jobId: job.data.id,
+          status: response.status.toString(),
+          response: await response.json(),
+        });
+        await db
+          .update(jobs)
+          .set({
+            executeAt: parser
+              .parseExpression(job.data.cronspec)
+              .next()
+              .toDate(),
+          })
+          .where(eq(jobs.id, job.data.id));
+      }
+    },
+    { connection: redisConn }
+  );
 
   const job = new CronJob("* * * * *", async () => {
     console.log("[Scheduler] Checking jobs to run");
@@ -22,31 +70,19 @@ async function main() {
       return;
     }
     console.log("[Scheduler] Found jobs to run, executing...");
-    for (const job of result) {
-      const options: Options = {
-        method: job.method,
-        throwHttpErrors: false,
-      };
-      if (job.headers) options.headers = job.headers as Record<string, string>;
-      if (job.body) options.body = job.body as BodyInit;
-      const response = await ky(job.url, options);
-      await db.insert(logs).values({
-        jobId: job.id,
-        status: response.status.toString(),
-        response: await response.json(),
-      });
-      await db
-        .update(jobs)
-        .set({
-          executeAt: parser.parseExpression(job.cronspec).next().toDate(),
-        })
-        .where(eq(jobs.id, job.id));
-    }
-    console.log("[Scheduler] Finished executing jobs");
+    const promises = result.map((job) => queue.add("execute", job));
+    await Promise.all(promises);
   });
 
   job.start();
   console.log("[Scheduler] Started");
+
+  worker.on("completed", (job) => {
+    console.log(`[Worker] Job ${job.id} completed`);
+  });
+  worker.on("failed", (job, err) => {
+    console.error(`[Worker] Job ${job!.id} failed:`, err);
+  });
 
   process.on("SIGINT", () => {
     job.stop();
