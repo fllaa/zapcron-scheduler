@@ -27,6 +27,16 @@ jobs:
         id: commithash
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Build and push Migration image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./migration.Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/bolabali-migration:${{ env.BRANCH_NAME }},${{ secrets.DOCKER_USERNAME }}/bolabali-migration:${{ env.BRANCH_NAME }}-${{ steps.commithash.outputs.sha_short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build and push Scheduler image
         uses: docker/build-push-action@v5
         with:
@@ -43,4 +53,5 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
+          kubectl set image deployment/bolabali migration=${{ secrets.DOCKER_USERNAME }}/bolabali-migration:${{ env.BRANCH_NAME }}-${{ steps.commithash.outputs.sha_short }}
           kubectl set image deployment/bolabali scheduler=${{ secrets.DOCKER_USERNAME }}/bolabali-scheduler:${{ env.BRANCH_NAME }}-${{ steps.commithash.outputs.sha_short }}
