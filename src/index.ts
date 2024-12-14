@@ -25,6 +25,7 @@ async function main() {
     for (const job of result) {
       const options: Options = {
         method: job.method,
+        throwHttpErrors: false,
       };
       if (job.headers) options.headers = job.headers as Record<string, string>;
       if (job.body) options.body = job.body as BodyInit;
