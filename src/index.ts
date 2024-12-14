@@ -38,7 +38,7 @@ async function main() {
         };
         if (job.data.headers)
           options.headers = job.data.headers as Record<string, string>;
-        if (job.data.body) options.body = job.data.body as BodyInit;
+        if (job.data.body) options.json = job.data.body as BodyInit;
         const response = await ky(job.data.url, options);
         await db.insert(logs).values({
           jobId: job.data.id,
