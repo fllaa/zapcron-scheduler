@@ -44,4 +44,3 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/bolabali scheduler=${{ secrets.DOCKER_USERNAME }}/bolabali-scheduler:${{ env.BRANCH_NAME }}-${{ steps.commithash.outputs.sha_short }}
-          kubectl rollout restart deployment/bolabali
