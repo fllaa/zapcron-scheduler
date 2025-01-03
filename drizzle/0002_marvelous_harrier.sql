@@ -1,1 +1,1 @@
-ALTER TABLE "bolabali_job" ADD COLUMN "is_enabled" boolean DEFAULT true NOT NULL;
+ALTER TABLE "zc_job" ADD COLUMN "is_enabled" boolean DEFAULT true NOT NULL;

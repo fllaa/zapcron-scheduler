@@ -4,8 +4,8 @@
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.bolabali_account": {
-      "name": "bolabali_account",
+    "public.zc_account": {
+      "name": "zc_account",
       "schema": "",
       "columns": {
         "user_id": {
@@ -99,27 +99,20 @@
         }
       },
       "foreignKeys": {
-        "bolabali_account_user_id_bolabali_user_id_fk": {
-          "name": "bolabali_account_user_id_bolabali_user_id_fk",
-          "tableFrom": "bolabali_account",
-          "tableTo": "bolabali_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+        "zc_account_user_id_zc_user_id_fk": {
+          "name": "zc_account_user_id_zc_user_id_fk",
+          "tableFrom": "zc_account",
+          "tableTo": "zc_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "bolabali_account_provider_provider_account_id_pk": {
-          "name": "bolabali_account_provider_provider_account_id_pk",
-          "columns": [
-            "provider",
-            "provider_account_id"
-          ]
+        "zc_account_provider_provider_account_id_pk": {
+          "name": "zc_account_provider_provider_account_id_pk",
+          "columns": ["provider", "provider_account_id"]
         }
       },
       "uniqueConstraints": {},
@@ -127,8 +120,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.bolabali_job": {
-      "name": "bolabali_job",
+    "public.zc_job": {
+      "name": "zc_job",
       "schema": "",
       "columns": {
         "id": {
@@ -138,7 +131,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "bolabali_job_id_seq",
+            "name": "zc_job_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -249,16 +242,12 @@
         }
       },
       "foreignKeys": {
-        "bolabali_job_created_by_bolabali_user_id_fk": {
-          "name": "bolabali_job_created_by_bolabali_user_id_fk",
-          "tableFrom": "bolabali_job",
-          "tableTo": "bolabali_user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+        "zc_job_created_by_zc_user_id_fk": {
+          "name": "zc_job_created_by_zc_user_id_fk",
+          "tableFrom": "zc_job",
+          "tableTo": "zc_user",
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -269,8 +258,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.bolabali_log": {
-      "name": "bolabali_log",
+    "public.zc_log": {
+      "name": "zc_log",
       "schema": "",
       "columns": {
         "id": {
@@ -280,7 +269,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "bolabali_log_id_seq",
+            "name": "zc_log_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -334,16 +323,12 @@
         }
       },
       "foreignKeys": {
-        "bolabali_log_job_id_bolabali_job_id_fk": {
-          "name": "bolabali_log_job_id_bolabali_job_id_fk",
-          "tableFrom": "bolabali_log",
-          "tableTo": "bolabali_job",
-          "columnsFrom": [
-            "job_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+        "zc_log_job_id_zc_job_id_fk": {
+          "name": "zc_log_job_id_zc_job_id_fk",
+          "tableFrom": "zc_log",
+          "tableTo": "zc_job",
+          "columnsFrom": ["job_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -354,8 +339,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.bolabali_post": {
-      "name": "bolabali_post",
+    "public.zc_post": {
+      "name": "zc_post",
       "schema": "",
       "columns": {
         "id": {
@@ -365,7 +350,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "bolabali_post_id_seq",
+            "name": "zc_post_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -434,16 +419,12 @@
         }
       },
       "foreignKeys": {
-        "bolabali_post_created_by_bolabali_user_id_fk": {
-          "name": "bolabali_post_created_by_bolabali_user_id_fk",
-          "tableFrom": "bolabali_post",
-          "tableTo": "bolabali_user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+        "zc_post_created_by_zc_user_id_fk": {
+          "name": "zc_post_created_by_zc_user_id_fk",
+          "tableFrom": "zc_post",
+          "tableTo": "zc_user",
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -454,8 +435,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.bolabali_session": {
-      "name": "bolabali_session",
+    "public.zc_session": {
+      "name": "zc_session",
       "schema": "",
       "columns": {
         "session_token": {
@@ -495,16 +476,12 @@
         }
       },
       "foreignKeys": {
-        "bolabali_session_user_id_bolabali_user_id_fk": {
-          "name": "bolabali_session_user_id_bolabali_user_id_fk",
-          "tableFrom": "bolabali_session",
-          "tableTo": "bolabali_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+        "zc_session_user_id_zc_user_id_fk": {
+          "name": "zc_session_user_id_zc_user_id_fk",
+          "tableFrom": "zc_session",
+          "tableTo": "zc_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -515,8 +492,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.bolabali_user": {
-      "name": "bolabali_user",
+    "public.zc_user": {
+      "name": "zc_user",
       "schema": "",
       "columns": {
         "id": {
@@ -559,8 +536,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.bolabali_verification_token": {
-      "name": "bolabali_verification_token",
+    "public.zc_verification_token": {
+      "name": "zc_verification_token",
       "schema": "",
       "columns": {
         "identifier": {
@@ -585,12 +562,9 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "bolabali_verification_token_identifier_token_pk": {
-          "name": "bolabali_verification_token_identifier_token_pk",
-          "columns": [
-            "identifier",
-            "token"
-          ]
+        "zc_verification_token_identifier_token_pk": {
+          "name": "zc_verification_token_identifier_token_pk",
+          "columns": ["identifier", "token"]
         }
       },
       "uniqueConstraints": {},

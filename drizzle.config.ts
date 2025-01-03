@@ -6,5 +6,5 @@ export default {
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
-  tablesFilter: ["bolabali_*"],
+  tablesFilter: ["zc_*"],
 } satisfies Config;

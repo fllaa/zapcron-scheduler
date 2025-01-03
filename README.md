@@ -1,4 +1,4 @@
-# bolabali-scheduler
+# zapcron-scheduler
 
 To install dependencies:
 
