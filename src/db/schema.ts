@@ -183,11 +183,19 @@ export const logs = createTable(
       .references(() => jobs.id, { onDelete: "cascade" }),
     status: varchar("status", { length: 255 }).notNull(),
     response: json("response"),
+    duration: integer("duration").notNull().default(0),
+    mode: varchar("mode", { length: 255 }).notNull().default("SCHEDULED"),
+    createdById: varchar("created_by", { length: 255 }).references(
+      () => users.id
+    ),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
-  (log) => [index("log_job_id_idx").on(log.jobId)]
+  (log) => [
+    index("log_job_id_idx").on(log.jobId),
+    index("log_created_by_idx").on(log.createdById),
+  ]
 );
 
 export type Log = InferSelectModel<typeof logs>;
