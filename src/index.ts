@@ -19,10 +19,10 @@ async function main() {
   }
 
   const redisConn = new IORedis({
-    host: process.env.REDIS_HOST || "localhost",
-    port: parseInt(process.env.REDIS_PORT || "6379"),
+    host: process.env.REDIS_HOST ?? "localhost",
+    port: parseInt(process.env.REDIS_PORT ?? "6379"),
     password: process.env.REDIS_PASSWORD,
-    db: parseInt(process.env.REDIS_DB || "0"),
+    db: parseInt(process.env.REDIS_DB ?? "0"),
     maxRetriesPerRequest: null,
   });
 
@@ -32,6 +32,7 @@ async function main() {
     "jobs",
     async (job) => {
       if (job.name === "execute") {
+        const isImmediate = !!job.data?.triggeredBy;
         const options: Options = {
           method: job.data.method,
           throwHttpErrors: false,
@@ -39,11 +40,16 @@ async function main() {
         if (job.data.headers)
           options.headers = job.data.headers as Record<string, string>;
         if (job.data.body) options.json = job.data.body as BodyInit;
+        const start = Date.now();
         const response = await ky(job.data.url, options);
+        const end = Date.now();
         await db.insert(logs).values({
           jobId: job.data.id,
           status: response.status.toString(),
           response: await response.json(),
+          duration: end - start,
+          mode: isImmediate ? "IMMEDIATE" : "SCHEDULED",
+          createdById: job.data?.triggeredBy,
         });
         await db
           .update(jobs)
