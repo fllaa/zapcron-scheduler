@@ -62,7 +62,10 @@ async function main() {
           .where(eq(jobs.id, job.data.id));
       }
     },
-    { connection: redisConn }
+    {
+      connection: redisConn,
+      concurrency: parseInt(process.env.WORKER_CONCURRENCY ?? "1"),
+    }
   );
 
   worker.on("ready", () => {
