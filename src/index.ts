@@ -32,6 +32,15 @@ async function main() {
     "jobs",
     async (job) => {
       if (job.name === "execute") {
+        await db
+          .update(jobs)
+          .set({
+            executeAt: parser
+              .parseExpression(job.data.cronspec)
+              .next()
+              .toDate(),
+          })
+          .where(eq(jobs.id, job.data.id));
         const isImmediate = !!job.data?.triggeredBy;
         const options: Options = {
           method: job.data.method,
@@ -51,15 +60,6 @@ async function main() {
           mode: isImmediate ? "IMMEDIATE" : "SCHEDULED",
           createdById: job.data?.triggeredBy,
         });
-        await db
-          .update(jobs)
-          .set({
-            executeAt: parser
-              .parseExpression(job.data.cronspec)
-              .next()
-              .toDate(),
-          })
-          .where(eq(jobs.id, job.data.id));
       }
     },
     {
