@@ -32,25 +32,6 @@ async function main() {
     "jobs",
     async (job) => {
       if (job.name === "execute") {
-        const isImmediate = !!job.data?.triggeredBy;
-        const options: Options = {
-          method: job.data.method,
-          throwHttpErrors: false,
-        };
-        if (job.data.headers)
-          options.headers = job.data.headers as Record<string, string>;
-        if (job.data.body) options.json = job.data.body as BodyInit;
-        const start = Date.now();
-        const response = await ky(job.data.url, options);
-        const end = Date.now();
-        await db.insert(logs).values({
-          jobId: job.data.id,
-          status: response.status.toString(),
-          response: await response.json(),
-          duration: end - start,
-          mode: isImmediate ? "IMMEDIATE" : "SCHEDULED",
-          createdById: job.data?.triggeredBy,
-        });
         await db
           .update(jobs)
           .set({
@@ -60,6 +41,36 @@ async function main() {
               .toDate(),
           })
           .where(eq(jobs.id, job.data.id));
+        const isImmediate = !!job.data?.triggeredBy;
+        const options: Options = {
+          method: job.data.method,
+          throwHttpErrors: false,
+        };
+        if (job.data.headers)
+          options.headers = job.data.headers as Record<string, string>;
+        if (job.data.body) options.json = job.data.body as BodyInit;
+        try {
+          const start = Date.now();
+          const response = await ky(job.data.url, options);
+          const end = Date.now();
+          await db.insert(logs).values({
+            jobId: job.data.id,
+            status: response.status.toString(),
+            response: await response.json(),
+            duration: end - start,
+            mode: isImmediate ? "IMMEDIATE" : "SCHEDULED",
+            createdById: job.data?.triggeredBy,
+          });
+        } catch (err) {
+          await db.insert(logs).values({
+            jobId: job.data.id,
+            status: "599",
+            response: JSON.stringify(err),
+            duration: 0,
+            mode: isImmediate? "IMMEDIATE" : "SCHEDULED",
+            createdById: job.data?.triggeredBy,
+          });
+        }
       }
     },
     {
