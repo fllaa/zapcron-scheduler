@@ -49,17 +49,28 @@ async function main() {
         if (job.data.headers)
           options.headers = job.data.headers as Record<string, string>;
         if (job.data.body) options.json = job.data.body as BodyInit;
-        const start = Date.now();
-        const response = await ky(job.data.url, options);
-        const end = Date.now();
-        await db.insert(logs).values({
-          jobId: job.data.id,
-          status: response.status.toString(),
-          response: await response.json(),
-          duration: end - start,
-          mode: isImmediate ? "IMMEDIATE" : "SCHEDULED",
-          createdById: job.data?.triggeredBy,
-        });
+        try {
+          const start = Date.now();
+          const response = await ky(job.data.url, options);
+          const end = Date.now();
+          await db.insert(logs).values({
+            jobId: job.data.id,
+            status: response.status.toString(),
+            response: await response.json(),
+            duration: end - start,
+            mode: isImmediate ? "IMMEDIATE" : "SCHEDULED",
+            createdById: job.data?.triggeredBy,
+          });
+        } catch (err) {
+          await db.insert(logs).values({
+            jobId: job.data.id,
+            status: "599",
+            response: JSON.stringify(err),
+            duration: 0,
+            mode: isImmediate? "IMMEDIATE" : "SCHEDULED",
+            createdById: job.data?.triggeredBy,
+          });
+        }
       }
     },
     {
