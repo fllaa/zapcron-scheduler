@@ -45,6 +45,7 @@ async function main() {
         const options: Options = {
           method: job.data.method,
           throwHttpErrors: false,
+          timeout: parseInt(process.env.HTTP_TIMEOUT ?? "60000"),
         };
         if (job.data.headers)
           options.headers = job.data.headers as Record<string, string>;
@@ -67,7 +68,7 @@ async function main() {
             status: "599",
             response: JSON.stringify(err),
             duration: 0,
-            mode: isImmediate? "IMMEDIATE" : "SCHEDULED",
+            mode: isImmediate ? "IMMEDIATE" : "SCHEDULED",
             createdById: job.data?.triggeredBy,
           });
         }
